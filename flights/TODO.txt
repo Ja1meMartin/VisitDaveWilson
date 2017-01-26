@@ -1,0 +1,58 @@
+TODO:
+Modules for Flight Search Form (Between ....)
+Mix cypher statements with InOrder Traversal
+Start downloading data (may have to start deleting old markets (NO keep markets delete flights) )
+ - query to get all flights FROM A to B (Airport-()-(Flight) - () - Airport)
+ - update, delete, add flights
+
+ 
+ Notebooks TODO:
+ get all flightd A to BEFORE
+ inorder + Cypher
+ 
+ HTML TODO:
+ - Trip Parameters
+ - Single destination {exactly | at most | at least | between} days {after | before | on}
+ - Single destination Detour
+ - Multi Start
+ - Multi Stop
+
+
+Front End:
+Select Trip Type:
+- Single destination return (3 USP: choose day, leave from a differnt airport, pick duration)
+- Multiple start destinations
+- Multi Stop
+- names SDR, MultiStop, MultiStart
+
+- Number of start destinations
+- Any stopovers (Yes)
+
+Start:
+- /start (Location, TimeInterval)
+- After/Before/Between/Day of the week/Include
+- After/Before upto .. days _____
+- Between convert to datepicker (how do I turn it off?)
+- 
+
+FLEXIBLE ON TIME AND TIMESLICE
+BETWEEN: I have good dates, where should I go
+AFTER: 
+BEFORE: You're going some where but are flexible on date you get there
+
+
+START
+
+
+
+
+
+Add Airports
+- Toulouse (City)
+- TLS: Toulouse Blagnac Airport
+- France
+- FR-N
+- Nearby and Commutable
+
+Trip Parametrs
+- Set Budget (LIMIT 1 then do real query), Total Length (on multi stop)

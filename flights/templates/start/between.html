@@ -1,0 +1,22 @@
+{% macro between_dates() %}
+
+
+	<script>
+	  $( function() {{
+		$( "#datepicker" ).datepicker();
+	  }} );
+	  
+	  $( function() {{
+		$( "#datepicker2" ).datepicker();
+	  }} )
+	  
+	  alert("MACRO WORKING");
+	</script>
+
+	<td>
+		<input id="datepicker" name="startDate" value="4+" type="text">
+	</td>
+	<td>
+		<input  id="datepicker2" name="startDay" value="FRI" type="text">
+	</td>
+{$ endmacro}

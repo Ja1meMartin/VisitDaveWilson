@@ -1,0 +1,616 @@
+{% extends "layout.html" %}
+
+
+
+{% block body %}
+
+	<!-- 
+		syle for sel_start_airport combo box
+		
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://jqueryui.com/resources/demos/style.css">
+	 --> 
+	 
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="https://jqueryui.com/resources/demos/style.css">
+
+  <style>
+  .custom-combobox {
+    position: relative;
+    display: inline-block;
+  }
+  .custom-combobox-toggle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-left: -1px;
+    padding: 0;
+  }
+  .custom-combobox-input {
+    margin: 0;
+    padding: 5px 10px;
+  }
+  </style>
+  
+  <!-- 
+		script for sel_start_airport combo box
+	-->
+  <script>
+  $( function() {
+    $.widget( "custom.combobox", {
+      _create: function() {
+        this.wrapper = $( "<span>" )
+          .addClass( "custom-combobox" )
+          .insertAfter( this.element );
+ 
+        this.element.hide();
+        this._createAutocomplete();
+        this._createShowAllButton();
+      },
+ 
+      _createAutocomplete: function() {
+        var selected = this.element.children( ":selected" ),
+          value = selected.val() ? selected.text() : "";
+ 
+        this.input = $( "<input>" )
+          .appendTo( this.wrapper )
+          .val( value )
+          .attr( "title", "" )
+          .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+          .autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: $.proxy( this, "_source" )
+          })
+          .tooltip({
+            classes: {
+              "ui-tooltip": "ui-state-highlight"
+            }
+          });
+ 
+        this._on( this.input, {
+          autocompleteselect: function( event, ui ) {
+            ui.item.option.selected = true;
+            this._trigger( "select", event, {
+              item: ui.item.option
+            });
+          },
+ 
+          autocompletechange: "_removeIfInvalid"
+        });
+      },
+ 
+      _createShowAllButton: function() {
+        var input = this.input,
+          wasOpen = false;
+ 
+        $( "<a>" )
+          .attr( "tabIndex", -1 )
+          .attr( "title", "Show All Items" )
+          .tooltip()
+          .appendTo( this.wrapper )
+          .button({
+            icons: {
+              primary: "ui-icon-triangle-1-s"
+            },
+            text: false
+          })
+          .removeClass( "ui-corner-all" )
+          .addClass( "custom-combobox-toggle ui-corner-right" )
+          .on( "mousedown", function() {
+            wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+          })
+          .on( "click", function() {
+            input.trigger( "focus" );
+ 
+            // Close if already visible
+            if ( wasOpen ) {
+              return;
+            }
+ 
+            // Pass empty string as value to search for, displaying all results
+            input.autocomplete( "search", "" );
+          });
+      },
+ 
+      _source: function( request, response ) {
+        var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+        response( this.element.children( "option" ).map(function() {
+          var text = $( this ).text();
+          if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+      },
+ 
+      _removeIfInvalid: function( event, ui ) {
+ 
+        // Selected an item, nothing to do
+        if ( ui.item ) {
+          return;
+        }
+ 
+        // Search for a match (case-insensitive)
+        var value = this.input.val(),
+          valueLowerCase = value.toLowerCase(),
+          valid = false;
+        this.element.children( "option" ).each(function() {
+          if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+            this.selected = valid = true;
+            return false;
+          }
+        });
+ 
+        // Found a match, nothing to do
+        if ( valid ) {
+          return;
+        }
+ 
+        // Remove invalid value
+        this.input
+          .val( "" )
+          .attr( "title", value + " didn't match any item" )
+          .tooltip( "open" );
+        this.element.val( "" );
+        this._delay(function() {
+          this.input.tooltip( "close" ).attr( "title", "" );
+        }, 2500 );
+        this.input.autocomplete( "instance" ).term = "";
+      },
+ 
+      _destroy: function() {
+        this.wrapper.remove();
+        this.element.show();
+      }
+    });
+ 
+	// replace id
+    $( "#fp_oneairport" ).combobox();
+    //$( "#toggle" ).on( "click", function() {
+      //$( "#fp_oneairport" ).toggle();
+    //});
+  } );
+  </script>
+
+	<form action="{{ url_for('wizard') }}" method="post">
+		<h2>Start Airport</H2>
+		<p>
+			<input type="radio" name="start_airport" id="option11" value="oneairport" required> I know which airport I want to leave from </input><br>
+			<input type="radio" name="start_airport" id="option12" value="multiairport"> I am part of a group leaving from multiple airports </input><br>
+			<input type="radio" name="start_airport" id="option13" value="nearby"> I am willing to fly from any airport near me </input><br>		
+		</p>
+		<p>
+		<div class="ui-widget">
+			<table>
+			  <tr>
+				<td>
+				  <label>Starting Airport:</label>
+				</td>
+				<td>
+				  <select id="fp_oneairport" class="combobox">
+				  <option value="Aalborg">Aalborg</option>
+<option value="Aalborg Airport">Aalborg Airport</option>
+<option value="Aberdeen">Aberdeen</option>
+<option value="Aberdeen Dyce Airport">Aberdeen Dyce Airport</option>
+<option value="Adolfo Su&#225;rez Madrid&#8211;Barajas Airport">Adolfo Su&#225;rez Madrid&#8211;Barajas Airport</option>
+<option value="Agen-La Garenne Airport">Agen-La Garenne Airport</option>
+<option value="Agen/La Garenne">Agen/La Garenne</option>
+<option value="Akrotiri">Akrotiri</option>
+<option value="Albania">Albania</option>
+<option value="Alicante">Alicante</option>
+<option value="Alicante International Airport">Alicante International Airport</option>
+<option value="Amsterdam">Amsterdam</option>
+<option value="Amsterdam Airport Schiphol">Amsterdam Airport Schiphol</option>
+<option value="Atat&#252;rk International Airport">Atat&#252;rk International Airport</option>
+<option value="Athens">Athens</option>
+<option value="Austria">Austria</option>
+<option value="Baden-Baden">Baden-Baden</option>
+<option value="Barcelona">Barcelona</option>
+<option value="Barcelona International Airport">Barcelona International Airport</option>
+<option value="Bari">Bari</option>
+<option value="Bari Karol Wojty&#322;a Airport">Bari Karol Wojty&#322;a Airport</option>
+<option value="Belarus">Belarus</option>
+<option value="Belfast">Belfast</option>
+<option value="Belfast International Airport">Belfast International Airport</option>
+<option value="Belgium">Belgium</option>
+<option value="Belgrade">Belgrade</option>
+<option value="Belgrade Nikola Tesla Airport">Belgrade Nikola Tesla Airport</option>
+<option value="Bergamo">Bergamo</option>
+<option value="Bergen">Bergen</option>
+<option value="Bergen Airport Flesland">Bergen Airport Flesland</option>
+<option value="Bergerac-Roumani&#232;re Airport">Bergerac-Roumani&#232;re Airport</option>
+<option value="Bergerac/Roumani&#232;re">Bergerac/Roumani&#232;re</option>
+<option value="Berlin">Berlin</option>
+<option value="Berlin-Sch&#246;nefeld International Airport">Berlin-Sch&#246;nefeld International Airport</option>
+<option value="Berlin-Tegel International Airport">Berlin-Tegel International Airport</option>
+<option value="Biarritz-Anglet-Bayonne Airport">Biarritz-Anglet-Bayonne Airport</option>
+<option value="Biarritz/Anglet/Bayonne">Biarritz/Anglet/Bayonne</option>
+<option value="Billund">Billund</option>
+<option value="Billund Airport">Billund Airport</option>
+<option value="Birmingham">Birmingham</option>
+<option value="Birmingham International Airport">Birmingham International Airport</option>
+<option value="Bod&#248;">Bod&#248;</option>
+<option value="Bod&#248; Airport">Bod&#248; Airport</option>
+<option value="Bologna">Bologna</option>
+<option value="Bologna Guglielmo Marconi Airport">Bologna Guglielmo Marconi Airport</option>
+<option value="Bordeaux-M&#233;rignac Airport">Bordeaux-M&#233;rignac Airport</option>
+<option value="Bordeaux/M&#233;rignac">Bordeaux/M&#233;rignac</option>
+<option value="Boryspil International Airport">Boryspil International Airport</option>
+<option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+<option value="Bournemouth">Bournemouth</option>
+<option value="Bournemouth Airport">Bournemouth Airport</option>
+<option value="Bratislava">Bratislava</option>
+<option value="Bremen">Bremen</option>
+<option value="Bremen Airport">Bremen Airport</option>
+<option value="Bristol">Bristol</option>
+<option value="Bristol International Airport">Bristol International Airport</option>
+<option value="Brize Norton">Brize Norton</option>
+<option value="Brussels">Brussels</option>
+<option value="Brussels Airport">Brussels Airport</option>
+<option value="Brussels South Charleroi Airport">Brussels South Charleroi Airport</option>
+<option value="Bucharest">Bucharest</option>
+<option value="Budapest">Budapest</option>
+<option value="Budapest Ferenc Liszt International Airport">Budapest Ferenc Liszt International Airport</option>
+<option value="Bulgaria">Bulgaria</option>
+<option value="Burgas">Burgas</option>
+<option value="Burgas Airport">Burgas Airport</option>
+<option value="B&#226;le/Mulhouse">B&#226;le/Mulhouse</option>
+<option value="Cagliari">Cagliari</option>
+<option value="Cagliari Elmas Airport">Cagliari Elmas Airport</option>
+<option value="Cardiff">Cardiff</option>
+<option value="Cardiff International Airport">Cardiff International Airport</option>
+<option value="Castres-Mazamet Airport">Castres-Mazamet Airport</option>
+<option value="Castres/Mazamet">Castres/Mazamet</option>
+<option value="Catania">Catania</option>
+<option value="Catania-Fontanarossa Airport">Catania-Fontanarossa Airport</option>
+<option value="Charles de Gaulle International Airport">Charles de Gaulle International Airport</option>
+<option value="Ciampino&#8211;G. B. Pastine International Airport">Ciampino&#8211;G. B. Pastine International Airport</option>
+<option value="Cologne">Cologne</option>
+<option value="Cologne Bonn Airport">Cologne Bonn Airport</option>
+<option value="Copenhagen">Copenhagen</option>
+<option value="Copenhagen Kastrup Airport">Copenhagen Kastrup Airport</option>
+<option value="Copernicus Wroc&#322;aw Airport">Copernicus Wroc&#322;aw Airport</option>
+<option value="Cork">Cork</option>
+<option value="Cork Airport">Cork Airport</option>
+<option value="Croatia">Croatia</option>
+<option value="Cuneo">Cuneo</option>
+<option value="Cuneo International Airport">Cuneo International Airport</option>
+<option value="Czechia">Czechia</option>
+<option value="Denmark">Denmark</option>
+<option value="Domodedovo International Airport">Domodedovo International Airport</option>
+<option value="Doncaster">Doncaster</option>
+<option value="Donetsk">Donetsk</option>
+<option value="Donetsk International Airport">Donetsk International Airport</option>
+<option value="Dortmund">Dortmund</option>
+<option value="Dortmund Airport">Dortmund Airport</option>
+<option value="Dresden">Dresden</option>
+<option value="Dresden Airport">Dresden Airport</option>
+<option value="Dublin">Dublin</option>
+<option value="Dublin Airport">Dublin Airport</option>
+<option value="D&#252;sseldorf">D&#252;sseldorf</option>
+<option value="D&#252;sseldorf International Airport">D&#252;sseldorf International Airport</option>
+<option value="East Midlands Airport">East Midlands Airport</option>
+<option value="Edinburgh">Edinburgh</option>
+<option value="Edinburgh Airport">Edinburgh Airport</option>
+<option value="Eindhoven">Eindhoven</option>
+<option value="Eindhoven Airport">Eindhoven Airport</option>
+<option value="Eleftherios Venizelos International Airport">Eleftherios Venizelos International Airport</option>
+<option value="Estonia">Estonia</option>
+<option value="EuroAirport Basel-Mulhouse-Freiburg Airport">EuroAirport Basel-Mulhouse-Freiburg Airport</option>
+<option value="Exeter">Exeter</option>
+<option value="Exeter International Airport">Exeter International Airport</option>
+<option value="Falcone&#8211;Borsellino Airport">Falcone&#8211;Borsellino Airport</option>
+<option value="Faro">Faro</option>
+<option value="Faro Airport">Faro Airport</option>
+<option value="Finland">Finland</option>
+<option value="France">France</option>
+<option value="Francisco de S&#225; Carneiro Airport">Francisco de S&#225; Carneiro Airport</option>
+<option value="Frankfurt am Main International Airport">Frankfurt am Main International Airport</option>
+<option value="Frankfurt-am-Main">Frankfurt-am-Main</option>
+<option value="Gda&#324;sk">Gda&#324;sk</option>
+<option value="Gda&#324;sk Lech Wa&#322;&#281;sa Airport">Gda&#324;sk Lech Wa&#322;&#281;sa Airport</option>
+<option value="Geneva">Geneva</option>
+<option value="Geneva Cointrin International Airport">Geneva Cointrin International Airport</option>
+<option value="Genoa Cristoforo Colombo Airport">Genoa Cristoforo Colombo Airport</option>
+<option value="Genova">Genova</option>
+<option value="George Best Belfast City Airport">George Best Belfast City Airport</option>
+<option value="Germany">Germany</option>
+<option value="Gibraltar">Gibraltar</option>
+<option value="Gibraltar Airport">Gibraltar Airport</option>
+<option value="Glasgow">Glasgow</option>
+<option value="Glasgow International Airport">Glasgow International Airport</option>
+<option value="Gothenburg">Gothenburg</option>
+<option value="Gothenburg-Landvetter Airport">Gothenburg-Landvetter Airport</option>
+<option value="Gran Canaria Airport">Gran Canaria Airport</option>
+<option value="Gran Canaria Island">Gran Canaria Island</option>
+<option value="Greece">Greece</option>
+<option value="Grozny">Grozny</option>
+<option value="Grozny North Airport">Grozny North Airport</option>
+<option value="Hamburg">Hamburg</option>
+<option value="Hamburg Airport">Hamburg Airport</option>
+<option value="Hannover">Hannover</option>
+<option value="Hannover Airport">Hannover Airport</option>
+<option value="Helsinki">Helsinki</option>
+<option value="Helsinki Vantaa Airport">Helsinki Vantaa Airport</option>
+<option value="Henri Coand&#259; International Airport">Henri Coand&#259; International Airport</option>
+<option value="Heraklion">Heraklion</option>
+<option value="Heraklion International Nikos Kazantzakis Airport">Heraklion International Nikos Kazantzakis Airport</option>
+<option value="Hungary">Hungary</option>
+<option value="Iceland">Iceland</option>
+<option value="Il Caravaggio International Airport">Il Caravaggio International Airport</option>
+<option value="Ireland">Ireland</option>
+<option value="Istanbul">Istanbul</option>
+<option value="Italy">Italy</option>
+<option value="John Paul II International Airport Krak&#243;w-Balice Airport">John Paul II International Airport Krak&#243;w-Balice Airport</option>
+<option value="Jo&#227;o Paulo II Airport">Jo&#227;o Paulo II Airport</option>
+<option value="Karlsruhe Baden-Baden Airport">Karlsruhe Baden-Baden Airport</option>
+<option value="Katowice">Katowice</option>
+<option value="Katowice International Airport">Katowice International Airport</option>
+<option value="Kazan">Kazan</option>
+<option value="Kazan International Airport">Kazan International Airport</option>
+<option value="Keflavik International Airport">Keflavik International Airport</option>
+<option value="Kharkiv">Kharkiv</option>
+<option value="Kharkiv International Airport">Kharkiv International Airport</option>
+<option value="Kiev">Kiev</option>
+<option value="Krak&#243;w">Krak&#243;w</option>
+<option value="Kurumoch International Airport">Kurumoch International Airport</option>
+<option value="Lajes">Lajes</option>
+<option value="Lajes Field">Lajes Field</option>
+<option value="Latvia">Latvia</option>
+<option value="Leeds">Leeds</option>
+<option value="Leeds Bradford Airport">Leeds Bradford Airport</option>
+<option value="Leipzig">Leipzig</option>
+<option value="Leipzig Halle Airport">Leipzig Halle Airport</option>
+<option value="Lennart Meri Tallinn Airport">Lennart Meri Tallinn Airport</option>
+<option value="Leonardo da Vinci&#8211;Fiumicino Airport">Leonardo da Vinci&#8211;Fiumicino Airport</option>
+<option value="Limerick">Limerick</option>
+<option value="Linate Airport">Linate Airport</option>
+<option value="Lisbon">Lisbon</option>
+<option value="Lisbon Portela Airport">Lisbon Portela Airport</option>
+<option value="Lithuania">Lithuania</option>
+<option value="Liverpool">Liverpool</option>
+<option value="Liverpool John Lennon Airport">Liverpool John Lennon Airport</option>
+<option value="Li&#232;ge">Li&#232;ge</option>
+<option value="Li&#232;ge Airport">Li&#232;ge Airport</option>
+<option value="Ljubljana">Ljubljana</option>
+<option value="Ljubljana Jo&#382;e Pu&#269;nik Airport">Ljubljana Jo&#382;e Pu&#269;nik Airport</option>
+<option value="London">London</option>
+<option value="London Gatwick Airport">London Gatwick Airport</option>
+<option value="London Heathrow Airport">London Heathrow Airport</option>
+<option value="London Luton Airport">London Luton Airport</option>
+<option value="London Stansted Airport">London Stansted Airport</option>
+<option value="Lule&#229;">Lule&#229;</option>
+<option value="Lule&#229; Airport">Lule&#229; Airport</option>
+<option value="Luqa">Luqa</option>
+<option value="Luxembourg">Luxembourg</option>
+<option value="Luxembourg-Findel International Airport">Luxembourg-Findel International Airport</option>
+<option value="M. R. &#352;tef&#225;nik Airport">M. R. &#352;tef&#225;nik Airport</option>
+<option value="Maastricht">Maastricht</option>
+<option value="Maastricht Aachen Airport">Maastricht Aachen Airport</option>
+<option value="Madrid">Madrid</option>
+<option value="Malm&#246;">Malm&#246;</option>
+<option value="Malm&#246; Sturup Airport">Malm&#246; Sturup Airport</option>
+<option value="Malpensa International Airport">Malpensa International Airport</option>
+<option value="Malta">Malta</option>
+<option value="Malta International Airport">Malta International Airport</option>
+<option value="Manchester">Manchester</option>
+<option value="Manchester Airport">Manchester Airport</option>
+<option value="Marseille">Marseille</option>
+<option value="Marseille Provence Airport">Marseille Provence Airport</option>
+<option value="Milan">Milan</option>
+<option value="Minsk">Minsk</option>
+<option value="Minsk National Airport">Minsk National Airport</option>
+<option value="Modlin Airport">Modlin Airport</option>
+<option value="Montenegro">Montenegro</option>
+<option value="Moscow">Moscow</option>
+<option value="Munich">Munich</option>
+<option value="Munich International Airport">Munich International Airport</option>
+<option value="M&#225;laga">M&#225;laga</option>
+<option value="M&#225;laga Airport">M&#225;laga Airport</option>
+<option value="M&#252;nster">M&#252;nster</option>
+<option value="M&#252;nster Osnabr&#252;ck Airport">M&#252;nster Osnabr&#252;ck Airport</option>
+<option value="Naples International Airport">Naples International Airport</option>
+<option value="Netherlands">Netherlands</option>
+<option value="Newcastle">Newcastle</option>
+<option value="Newcastle Airport">Newcastle Airport</option>
+<option value="Nice">Nice</option>
+<option value="Nice-C&#244;te d'Azur Airport">Nice-C&#244;te d'Azur Airport</option>
+<option value="Norway">Norway</option>
+<option value="Norwich">Norwich</option>
+<option value="Norwich International Airport">Norwich International Airport</option>
+<option value="Nottingham">Nottingham</option>
+<option value="Nuremberg">Nuremberg</option>
+<option value="Nuremberg Airport">Nuremberg Airport</option>
+<option value="N&#225;poli">N&#225;poli</option>
+<option value="Odessa">Odessa</option>
+<option value="Odessa International Airport">Odessa International Airport</option>
+<option value="Oslo">Oslo</option>
+<option value="Oslo Gardermoen Airport">Oslo Gardermoen Airport</option>
+<option value="Palermo">Palermo</option>
+<option value="Palma De Mallorca">Palma De Mallorca</option>
+<option value="Palma De Mallorca Airport">Palma De Mallorca Airport</option>
+<option value="Paris">Paris</option>
+<option value="Paris-Orly Airport">Paris-Orly Airport</option>
+<option value="Pau Pyr&#233;n&#233;es Airport">Pau Pyr&#233;n&#233;es Airport</option>
+<option value="Pau/Pyr&#233;n&#233;es (Uzein)">Pau/Pyr&#233;n&#233;es (Uzein)</option>
+<option value="Pisa">Pisa</option>
+<option value="Pisa International Airport">Pisa International Airport</option>
+<option value="Podgorica">Podgorica</option>
+<option value="Podgorica Airport">Podgorica Airport</option>
+<option value="Poland">Poland</option>
+<option value="Ponta Delgada">Ponta Delgada</option>
+<option value="Porto">Porto</option>
+<option value="Portugal">Portugal</option>
+<option value="Pozna&#324;">Pozna&#324;</option>
+<option value="Pozna&#324;-&#321;awica Airport">Pozna&#324;-&#321;awica Airport</option>
+<option value="Prague">Prague</option>
+<option value="Prishtina">Prishtina</option>
+<option value="Pri&#353;tina International Airport">Pri&#353;tina International Airport</option>
+<option value="Pulkovo Airport">Pulkovo Airport</option>
+<option value="RAF Akrotiri">RAF Akrotiri</option>
+<option value="RAF Brize Norton">RAF Brize Norton</option>
+<option value="Reykjav&#237;k">Reykjav&#237;k</option>
+<option value="Riga">Riga</option>
+<option value="Riga International Airport">Riga International Airport</option>
+<option value="Robin Hood Doncaster Sheffield Airport">Robin Hood Doncaster Sheffield Airport</option>
+<option value="Rodez-Marcillac Airport">Rodez-Marcillac Airport</option>
+<option value="Rodez/Marcillac">Rodez/Marcillac</option>
+<option value="Roma">Roma</option>
+<option value="Romania">Romania</option>
+<option value="Rome">Rome</option>
+<option value="Rostov-on-Don">Rostov-on-Don</option>
+<option value="Rostov-on-Don Airport">Rostov-on-Don Airport</option>
+<option value="Russian Federation">Russian Federation</option>
+<option value="Samara">Samara</option>
+<option value="Santiago de Compostela">Santiago de Compostela</option>
+<option value="Santiago de Compostela Airport">Santiago de Compostela Airport</option>
+<option value="Sarajevo">Sarajevo</option>
+<option value="Sarajevo International Airport">Sarajevo International Airport</option>
+<option value="Serbia">Serbia</option>
+<option value="Shannon Airport">Shannon Airport</option>
+<option value="Sheremetyevo International Airport">Sheremetyevo International Airport</option>
+<option value="Simferopol">Simferopol</option>
+<option value="Simferopol International Airport">Simferopol International Airport</option>
+<option value="Slovakia">Slovakia</option>
+<option value="Slovenia">Slovenia</option>
+<option value="Sochi">Sochi</option>
+<option value="Sochi International Airport">Sochi International Airport</option>
+<option value="Sofia">Sofia</option>
+<option value="Sofia Airport">Sofia Airport</option>
+<option value="Southampton">Southampton</option>
+<option value="Southampton Airport">Southampton Airport</option>
+<option value="Spain">Spain</option>
+<option value="St. Petersburg">St. Petersburg</option>
+<option value="Stavanger">Stavanger</option>
+<option value="Stavanger Airport Sola">Stavanger Airport Sola</option>
+<option value="Stockholm">Stockholm</option>
+<option value="Stockholm-Arlanda Airport">Stockholm-Arlanda Airport</option>
+<option value="Stuttgart">Stuttgart</option>
+<option value="Stuttgart Airport">Stuttgart Airport</option>
+<option value="Sweden">Sweden</option>
+<option value="Switzerland">Switzerland</option>
+<option value="Tallinn">Tallinn</option>
+<option value="Tarbes-Lourdes-Pyr&#233;n&#233;es Airport">Tarbes-Lourdes-Pyr&#233;n&#233;es Airport</option>
+<option value="Tarbes/Lourdes/Pyr&#233;n&#233;es">Tarbes/Lourdes/Pyr&#233;n&#233;es</option>
+<option value="Tenerife Island">Tenerife Island</option>
+<option value="Tenerife Norte Airport">Tenerife Norte Airport</option>
+<option value="Tenerife South Airport">Tenerife South Airport</option>
+<option value="Thessaloniki">Thessaloniki</option>
+<option value="Thessaloniki Macedonia International Airport">Thessaloniki Macedonia International Airport</option>
+<option value="Tirana">Tirana</option>
+<option value="Tirana International Airport Mother Teresa">Tirana International Airport Mother Teresa</option>
+<option value="Torino">Torino</option>
+<option value="Toulouse-Blagnac Airport">Toulouse-Blagnac Airport</option>
+<option value="Toulouse/Blagnac">Toulouse/Blagnac</option>
+<option value="Treviso">Treviso</option>
+<option value="Treviso-Sant'Angelo Airport">Treviso-Sant'Angelo Airport</option>
+<option value="Troms&#248;">Troms&#248;</option>
+<option value="Troms&#248; Airport">Troms&#248; Airport</option>
+<option value="Trondheim">Trondheim</option>
+<option value="Trondheim Airport V&#230;rnes">Trondheim Airport V&#230;rnes</option>
+<option value="Turin Airport">Turin Airport</option>
+<option value="Turkey">Turkey</option>
+<option value="Ufa">Ufa</option>
+<option value="Ufa International Airport">Ufa International Airport</option>
+<option value="Ukraine">Ukraine</option>
+<option value="United Kingdom">United Kingdom</option>
+<option value="Varna">Varna</option>
+<option value="Varna Airport">Varna Airport</option>
+<option value="Venice">Venice</option>
+<option value="Venice Marco Polo Airport">Venice Marco Polo Airport</option>
+<option value="Verona">Verona</option>
+<option value="Verona Villafranca Airport">Verona Villafranca Airport</option>
+<option value="Vienna">Vienna</option>
+<option value="Vienna International Airport">Vienna International Airport</option>
+<option value="Vilnius">Vilnius</option>
+<option value="Vilnius International Airport">Vilnius International Airport</option>
+<option value="Vnukovo International Airport">Vnukovo International Airport</option>
+<option value="V&#225;clav Havel Airport Prague">V&#225;clav Havel Airport Prague</option>
+<option value="Warsaw">Warsaw</option>
+<option value="Warsaw Chopin Airport">Warsaw Chopin Airport</option>
+<option value="Wroc&#322;aw">Wroc&#322;aw</option>
+<option value="XK">XK</option>
+<option value="Zagreb">Zagreb</option>
+<option value="Zagreb Airport">Zagreb Airport</option>
+<option value="Zhukovsky">Zhukovsky</option>
+<option value="Zhukovsky International Airport">Zhukovsky International Airport</option>
+<option value="Zurich">Zurich</option>
+<option value="Z&#252;rich Airport">Z&#252;rich Airport</option>
+				  </select>
+				</td>
+			  </tr>
+			  
+			  </div>
+
+			</table>
+</div>
+
+		</p>
+		<h2>Duration</H2>
+		<p>
+			<input type="radio" name="duration" id="option21" value="alldays" required> Include all days</input><br>
+			<input type="radio" name="duration" id="option22" value="nonweekend"> Only count non-weekend days </input><br>
+		</p>
+		
+		<h2>Start Date</H2>
+		<p>
+			<input type="radio" name="start_date" id="option31" value="startbefore" required> Fly out before a certain date </input><br>
+			<input type="radio" name="start_date" id="option32" value="starton"> Fly on a certain date</input><br>
+			<input type="radio" name="start_date" id="option33" value="startafter"> Fly after a certain date</input><br>
+			<input type="radio" name="start_date" id="option43" value="startbetween"> Fly between two dates</input><br>
+		</p>
+		
+		<h2>Finish Date</H2>
+		<p>
+			<input type="radio" name="finish_date" id="option31" value="finishbefore" required> Fly home before a certain date </input><br>
+			<input type="radio" name="finish_date" id="option32" value="finishon"> Fly home on a certain date</input><br>
+			<input type="radio" name="finish_date" id="option33" value="finishafter"> Fly home after a certain date</input><br>
+			<input type="radio" name="finish_date" id="option43" value="finishbetween"> Fly home between two dates</input><br>
+		</p>
+		<p>
+			<input type=submit value=Next>
+		</p>
+	</form>
+		
+		
+	 <!-- 
+		dict of buttons - to groups
+	 --> 
+	<script type="text/javascript">
+		var radios = document.querySelectorAll('input[type=radio][name="start_airport"]');
+		
+		function changeHandler(event) {
+			var radioGroup = document.querySelectorAll('input[type=radio][name="' + this.name + '"]');
+			
+			Array.prototype.forEach.call(radioGroup, function(button) {
+				alert(button.id + " is selected? " + button.checked);
+				
+				if (button.checked){
+					alert('fp_' + button.value)
+					document.getElementById('fp_' + button.value).style.display = "block";
+				} else {
+					alert('fp_' + button.value)
+					document.getElementById('fp_' + button.value).style.display = "none";
+				}
+			});
+		}
+		
+		Array.prototype.forEach.call(radios, function(radio) {
+		  radio.addEventListener('change', changeHandler);
+		});
+	</script>
+
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+{% endblock %}

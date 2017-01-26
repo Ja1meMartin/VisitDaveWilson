@@ -1,0 +1,131 @@
+{% extends "layout.html" %}
+
+{% from "start/between.html" import between_dates %}
+
+{% block body %}
+
+	
+	
+
+	<script>
+	
+	
+	
+	
+		var addConnection = function(){
+		var d = document.getElementById("connections");
+		alert("Div" + d);
+		var i = document.createElement("input");
+		i.type = "text";
+		i.name = "user_name";
+		i.id = "user_name1";
+		d.appendChild(i);
+		}
+	</script>
+	
+	
+	
+  <h3>Search For Flight</h3>
+    
+	
+	<form action="{{ url_for('register') }}" method="post">
+        
+        <h3>Start</h3>
+		
+		<table>
+			<tr><th>Location</th><th>Name</th> <th>Date</th> <th>Start Day</th> </tr>
+			<tr>
+				<td>
+					<input  name="startLocation" value="City" type="text" >
+				</td>
+				
+				<td>
+					<input  name="startName" value="Liverpool" type="text">
+				</td>
+				
+				
+				
+				{{between_dates}}
+			</tr>
+		</table>
+		
+		<h3> Stops </h3>
+		
+		
+		<table>
+			<tr><th>Location</th><th>Name</th> <th>Duration</th><th>Leave From</th></tr>
+			<tr>
+				<td>
+					<input  name="stop1Location" value="City" type="text" >
+				</td>
+				
+				<td>
+					<input  name="stop1Name" value="Berlin" type="text" >
+				</td>
+				
+				<td>
+					<input  name="stop1Duration" value="3" type="text" >
+				</td>
+				<td>
+					<input  name="stop1Leave" type="text" >
+				</td>
+			</tr>
+			
+			<tr>
+				<td>
+					<input  name="stop2Location" value="City" type="text" >
+				</td>
+				
+				<td>
+					<input  name="stop2Name" value="Rome" type="text" >
+				</td>
+				
+				<td>
+					<input  name="stop2Duration" value="2" type="text" >
+				</td>
+				<td>
+					<input  name="stop2Leave" type="text" >
+				</td>
+			</tr>
+		</table>
+		
+		<h3> Destination </h3>
+		
+		<table>
+			<tr><th>Location</th><th>Name</th> <th>Duration</th><th>Leave From</th></tr>
+			<tr>
+				<td>
+					<input  name="destLocation" value="City" type="text" >
+				</td>
+				
+				<td>
+					<input  name="destName" value="Dublin" type="text" >
+				</td>
+				
+				<td>
+					<input  name="destDuration" value="1" type="text" >
+				</td>
+				<td>
+					<input  name="destLeave" type="text" >
+				</td>
+			</tr>
+			<label><input type="checkbox" name="returnTrip" value="Return"> Return Trip</label><br>
+		</table>
+		
+		
+        <input type="button" value="Add Connection" onclick="addConnection();">
+		<input type="submit" value="Register">
+   
+	</form>
+	
+	
+	{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+{% endblock %}
